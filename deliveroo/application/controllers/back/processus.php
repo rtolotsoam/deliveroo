@@ -14,6 +14,8 @@ class Processus extends CI_Controller
         $this->load->model('fte_traitement','traits');
         $this->load->model('fte_processus','procs');
         $this->load->model('fte_action','acts');
+        $this->load->model('fte_categories','cats');
+        $this->load->model('fte_notification','not');
 
     }
 
@@ -200,6 +202,25 @@ class Processus extends CI_Controller
 
             $proc_id = $this->input->post("procid");
             $this->procs->editer_processus($data_send,$proc_id);
+
+            $today = date('Y-m-d H:i:s');
+
+            $hierars = $this->cats->hierarchie((int)$proc_id);
+
+            $chemin = "";
+            foreach ($hierars as $hier) {
+                $chemin = $chemin.''.$hier->libelle_categories.'§§§';
+            }
+
+            $data_notification = array(
+                    'description'       => $chemin."(Libelle)".$libe,
+                    'objet'             => "Modification d'un traitement par ".ucfirst($this->session->userdata('prenom')).' (Mle : '.$this->session->userdata('mle').')',
+                    'matricule_modif'   => $this->session->userdata('mle'),
+                    'commentaires'      => "Libelle du processus modifier : ".$libe,
+                    'datetime_modif'    => $today
+            );
+
+            $this->not->ajouter_notification($data_notification);
 
         }else{
             redirect('login');

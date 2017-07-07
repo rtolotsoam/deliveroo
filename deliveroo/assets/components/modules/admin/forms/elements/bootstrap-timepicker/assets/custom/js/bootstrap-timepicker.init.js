@@ -33,5 +33,33 @@ $(function()
         showInputs: false,
         minuteStep: 5
     });
+    $('#timepicker-filter1').timepicker({
+        minuteStep: 1,
+        secondStep: 5,
+        showInputs: false,
+        showSeconds: true,
+        showMeridian: false
+    });
+    $('#timepicker-filter2').timepicker({
+        minuteStep: 1,
+        secondStep: 5,
+        showInputs: false,
+        showSeconds: true,
+        showMeridian: false
+    });
+    $('#timepicker-export1').timepicker({
+        minuteStep: 1,
+        secondStep: 5,
+        showInputs: false,
+        showSeconds: true,
+        showMeridian: false
+    });
+    $('#timepicker-export2').timepicker({
+        minuteStep: 1,
+        secondStep: 5,
+        showInputs: false,
+        showSeconds: true,
+        showMeridian: false
+    });
 
 });

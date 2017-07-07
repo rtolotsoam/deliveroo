@@ -215,3 +215,126 @@ function modifier_user(id){
 		$('#message_error_'+id).html('<div class="alert alert-danger" align="center">Les champs sont obligatoires !</div>');		
 	}
 }
+
+function modifier_user_profil(id){
+
+	var nouvpass = $('#nouvpass').val();
+	var confnouvpass = $('#confnouvpass').val();
+	var prenom = $('#prenom').val();
+	var mail = $('#mail').val();
+	var matricule = $('#matricule').val();
+	var pass = $('#pass').val();
+
+	if(nouvpass == '' && confnouvpass == ''){
+		
+		if(typeof mail != null && mail !=''){
+			// DONNEES DU FORMULAIRE MODIFIER PROFIL
+			var form_data = {
+				prenom : prenom,
+				matricule : matricule,
+				mail : mail,
+				pass : pass,
+				id_user : id,
+				modif : 'mail_renseigne',
+				ajax : '1'
+			};
+
+		}else{
+
+			$('#message_error').html('');
+
+			$('#prenom_error').html('');
+			$('#mail_error').html('<div class="alert alert-info" align="center">Veuillez renseigner votre adresse E-mail, si vous souhaitiez !</div>');
+			$('#modif_pass_error').html('');
+
+		}
+
+	}else{
+
+		if( nouvpass == confnouvpass){
+
+			if(typeof mail != null && mail !=''){
+
+				// DONNEES DU FORMULAIRE MODIFIER PROFIL
+				var form_data = {
+					prenom : prenom,
+					matricule : matricule,
+					mail : mail,
+					pass : nouvpass,
+					id_user : id,
+					modif : 'modif_pass_mail',
+					ajax : '1'
+				};
+
+			}else{
+
+				// DONNEES DU FORMULAIRE MODIFIER PROFIL
+				var form_data = {
+					prenom : prenom,
+					matricule : matricule,
+					mail : '',
+					pass : nouvpass,
+					id_user : id,
+					modif : 'modif_pass',
+					ajax : '1'
+				};
+			}
+
+		}else{
+
+			$('#message_error').html('');
+
+			$('#prenom_error').html('');
+			$('#mail_error').html('');
+			$('#modif_pass_error').html('<div class="alert alert-danger" align="center">Le nouveau mot de passe et son confirmation ne correspond pas !</div>');
+		}
+	}
+
+	
+	if(typeof form_data != 'undefined'){
+
+		$.ajax({
+			url: url_modif_user_profil,
+			type: 'POST',
+			data: form_data,
+			success: function(data) {
+
+				
+				// TRAITEMENT DES ERREURS
+				if(data == 'erreur'){
+					
+					$('#message_error').html('<div class="alert alert-danger" align="center">Veillez réessayer ulterieurement !</div>');
+					
+
+				}else if(data == 'success'){
+
+					window.location.href = url_accueil;
+
+				}else if(data == 'erreur-mail'){
+					
+					$('#prenom_error').html('');
+					$('#mail_error').html('<div class="alert alert-danger" align="center">Veillez vérifier votre adresse E-mail ! </div>');
+					$('#modif_pass_error').html('');
+
+					$('#message_error').html('');
+
+				}else{
+
+					var str = data;
+					var res = str.split("|||");
+
+					$('#prenom_error').html(res[0]);
+					$('#mail_error').html(res[1]);
+					$('#modif_pass_error').html(res[2]);
+
+					$('#message_error').html('');
+		
+				}
+
+
+			}
+		});
+
+		return true;
+	}
+}

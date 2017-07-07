@@ -25,6 +25,7 @@ class Login extends CI_Controller {
 		//** PARAMETRE VUE **
 		$data['titre'] = 'CONNEXION';
 		$data['css'] = array('admin/module.admin.page.login.min','admin/module.global');
+		$data['js'] = array('js/back.js');
 		//** END PARAMETRE VUE **
 
 		//** APPEL VUE **

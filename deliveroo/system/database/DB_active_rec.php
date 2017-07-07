@@ -586,6 +586,25 @@ class CI_DB_active_record extends CI_DB_driver {
 
 	// --------------------------------------------------------------------
 
+	// --------------------------------------------------------------------
+
+	/**
+	 * iLike
+	 *
+	 * Generates a %ILIKE% portion of the query. Separates
+	 * multiple calls with AND
+	 *
+	 * @param	mixed
+	 * @param	mixed
+	 * @return	object
+	 */
+	public function ilike($field, $match = '', $side = 'both')
+	{
+		return $this->_ilike($field, $match, 'AND ', $side);
+	}
+
+	// --------------------------------------------------------------------
+
 	/**
 	 * Not Like
 	 *
@@ -616,6 +635,25 @@ class CI_DB_active_record extends CI_DB_driver {
 	public function or_like($field, $match = '', $side = 'both')
 	{
 		return $this->_like($field, $match, 'OR ', $side);
+	}
+
+	// --------------------------------------------------------------------
+
+		// --------------------------------------------------------------------
+
+	/**
+	 * OR iLike
+	 *
+	 * Generates a %LIKE% portion of the query. Separates
+	 * multiple calls with OR
+	 *
+	 * @param	mixed
+	 * @param	mixed
+	 * @return	object
+	 */
+	public function or_ilike($field, $match = '', $side = 'both')
+	{
+		return $this->_ilike($field, $match, 'OR ', $side);
 	}
 
 	// --------------------------------------------------------------------
@@ -695,6 +733,70 @@ class CI_DB_active_record extends CI_DB_driver {
 		}
 		return $this;
 	}
+
+	// --------------------------------------------------------------------
+
+	/**
+	 * ILike
+	 *
+	 * Called by ilike() or orilike()
+	 *
+	 * @param	mixed
+	 * @param	mixed
+	 * @param	string
+	 * @return	object
+	 */
+
+	function _ilike($field, $match = '', $type = 'AND ', $side = 'both', $not = '')
+	{
+		if ( ! is_array($field))
+		{
+			$field = array($field => $match);
+		}
+
+		foreach ($field as $k => $v)
+		{
+			$k = $this->_protect_identifiers($k);
+
+			$prefix = (count($this->ar_like) == 0) ? '' : $type;
+
+			$v = $this->escape_like_str($v);
+			
+			if ($side == 'none')
+			{
+				$like_statement = $prefix." $k $not ILIKE '{$v}'";
+			}
+			elseif ($side == 'before')
+			{
+				$like_statement = $prefix." $k $not ILIKE '%{$v}'";
+			}
+			elseif ($side == 'after')
+			{
+				$like_statement = $prefix." $k $not ILIKE '{$v}%'";
+			}
+			else
+			{
+				$like_statement = $prefix." $k $not ILIKE '%{$v}%'";
+			}
+
+			// some platforms require an escape sequence definition for LIKE wildcards
+			if ($this->_like_escape_str != '')
+			{
+				$like_statement = $like_statement.sprintf($this->_like_escape_str, $this->_like_escape_chr);
+			}
+
+			$this->ar_like[] = $like_statement;
+			if ($this->ar_caching === TRUE)
+			{
+				$this->ar_cache_like[] = $like_statement;
+				$this->ar_cache_exists[] = 'ilike';
+			}
+
+		}
+		return $this;
+	}
+
+	// --------------------------------------------------------------------
 
 	// --------------------------------------------------------------------
 

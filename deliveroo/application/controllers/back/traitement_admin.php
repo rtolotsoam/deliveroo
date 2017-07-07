@@ -14,6 +14,7 @@ class Traitement_admin extends CI_Controller
         $this->load->model('fte_traitement','traits');
         $this->load->model('fte_processus','procs');
         $this->load->model('fte_categories','cats');
+        $this->load->model('fte_notification','not');
 
         $this->load->library('form_validation');
 
@@ -95,6 +96,33 @@ class Traitement_admin extends CI_Controller
                         $id_processus = $this->procs->ajouter_processus($data1);
                             
                             if($id_nouveu_sous_cat && $id_processus){
+
+                                $today = date('Y-m-d H:i:s');
+
+                                $hierars = $this->cats->hierarchie((int)$id_processus);
+
+                                $chemin = "";
+                                foreach ($hierars as $hier) {
+                                    $chemin = $chemin.''.$hier->libelle_categories.'§§§';
+                                }
+
+                                $libelle_sous_cat = $this->cats->liste_categories_by_id((int) $id_sous_cat);
+
+                                $data_notification = array(
+                                        'description'       => $chemin,
+                                        'objet'             => "Ajout d'un traitement par ".ucfirst($this->session->userdata('prenom')).' (Mle : '.$this->session->userdata('mle').')',
+                                        'matricule_modif'   => $this->session->userdata('mle'),
+                                        'commentaires'      =>"<ul class='etape'>
+                                            <li> <b> Libelle catégorie : </b>".$libelle_sous_cat[0]->libelle_categories."</li>
+                                            <li> <b> Libelle traitement </b> : ".$libelle."</li>
+                                            </ul>",
+                                        'datetime_modif'    => $today
+                                );
+
+                                $this->not->ajouter_notification($data_notification);
+
+
+
                                 echo "success";
                             }else{
                                 echo "erreur";
@@ -159,6 +187,32 @@ class Traitement_admin extends CI_Controller
                         $id_processus = $this->procs->ajouter_processus($data1);
                             
                             if($id_nouveu_sous_cat && $id_processus){
+
+
+                                $today = date('Y-m-d H:i:s');
+
+                                $hierars = $this->cats->hierarchie((int)$id_processus);
+
+                                $chemin = "";
+                                foreach ($hierars as $hier) {
+                                    $chemin = $chemin.''.$hier->libelle_categories.'§§§';
+                                }
+                                
+                                $data_notification = array(
+                                        'description'       => $chemin,
+                                        'objet'             => "Ajout d'un traitement et d'une nouveau catégorie par ".ucfirst($this->session->userdata('prenom')).' (Mle : '.$this->session->userdata('mle').')',
+                                        'matricule_modif'   => $this->session->userdata('mle'),
+                                        'commentaires'      => "<ul class='etape'>
+                                                        <li> <b> Libelle traitement : </b>".$libelle_trait."</li>
+                                                        <li> <b> Libelle catégorie : </b>".$libelle_sous_cat."</li>
+                                                        <li><b> Contenu catégorie : </b> ".$cont_cat_trait."</li>
+                                                    </ul>",
+                                        'datetime_modif'    => $today
+                                );
+
+                                $this->not->ajouter_notification($data_notification);
+
+
                                 echo "success";
                             }else{
                                 echo "erreur";

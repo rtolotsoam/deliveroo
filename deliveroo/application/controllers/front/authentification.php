@@ -44,6 +44,8 @@ class Authentification extends CI_Controller {
 				
 				if($user != false) {
 
+					$this->session->set_userdata('user', $user);
+					
 					// POUR L'HISTORIQUE
 					$this->session->set_userdata('loggin', true);
 					$this->session->set_userdata('ip', $ip);

@@ -1,11 +1,11 @@
-
-<div id="content">
-	<h1 class="content-heading bg-white border-bottom <?php if($level != "admin"){ echo "hidden"; }?>">
+<div id="content" >
+	<h1 style="z-index:1 !important;" class="content-heading bg-white border-bottom <?php if($level != "admin"){ echo "hidden"; }?>">
 		
-		<div class="row">
+		<div class="row" style="z-index:0 !important;">
 			<div class="col-md-4"> 
 	    		<a href="#ajout-traitement" data-toggle="modal" class="btn btn-success">AJOUTER TRAITEMENT</a>
 	    	</div>
+	    	
 	    	<div class="col-md-8"> 
 		    	<div class="form-group">
 			    	<label for="source-cat">Choisir le <?php echo ascii_to_entities("catégorie"); ?>: </label>
@@ -111,12 +111,6 @@
 								</div>
 								
 							</ul> 
-										
-
-										
-
-						
-
 						<?php
 							}
 						}

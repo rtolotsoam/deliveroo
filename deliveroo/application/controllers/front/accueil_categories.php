@@ -52,7 +52,7 @@ class Accueil_categories extends CI_Controller
             $data['access_2'] = $access_2;
             $data['access_3'] = $access_3;
             $data['access_4'] = $access_4;
-            //$data['js'] = array('js/back.js');
+            $data['js'] = array('js/back.js');
             //** END PARAMETRE VUE **
 		
             //** APPEL VUE **

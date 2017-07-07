@@ -159,26 +159,32 @@ class Utilisateur extends CI_Controller
 					'gestion_process' => $gestion_g
 				);
 
+				$data['prenom'] = $prenom;
+				$data['matricule'] = $matricule;
+				$data['pass'] = $pass;
+
+				// paramétre mail
+				$base = BASEPATH;
+
+		    	$filename       = 'logo_mail.png';
+
+		    	$rep = 'assets/images/'.$filename;
+
+		    	$directory = str_replace("system/", $rep, $base);
+
+		    	$this->email->phpmailer->AddEmbeddedImage($directory, 'logo_mail');
+
 				if($statut == '1'){
 
+					$data['statut'] = '1';
 
-					$this->email->from("", "Outil d'aide à l'agent DELIVEROO");
+					$view_mail = $this->load->view('front/mail/mail_view.php', $data, true);
+
+					$this->email->from("tolotra_si@vivetic.mg", "Outil d'aide à l'agent DELIVEROO");
 					$this->email->to($mail);
 					$this->email->subject("Création de votre compte utilisateur Outil d'aide à l'agent DELIVEROO");
 					
-					$this->email->message('
-						<strong>Bonjour '.strtoupper($prenom).'</strong><br/><br/>
-						<p>Votre compte a été créer pour utiliser l\'outil d\'aide à l\'agent DELIVEROO.</p>
-						<p>Ci-joint les détails</p>
-						<h2>Information sur votre compte : </h2>
-						<ol>
-							<li>Matricule : '.$matricule.'</li>
-							<li>Mot de passe : '.$pass.'</li>
-							<li>Lien : http://aide-agent.vivetic.com:8888/deliveroo</li>
-						</ol>
-						<p>Cordialement</p> 
-						<p><h4>Administration <span style="color:blue;">DELIVEROO</span></h4></p>
-						');
+					$this->email->message($view_mail);
 
 
 					$result = $this->email->send();
@@ -203,24 +209,15 @@ class Utilisateur extends CI_Controller
 
 				}else if($statut == '0'){
 
-					$this->email->from("", "Outil d'aide à l'agent DELIVEROO");
+					$data['statut'] = '0';
+
+					$view_mail = $this->load->view('front/mail/mail_view.php', $data, true);
+
+					$this->email->from("tolotra_si@vivetic.mg", "Outil d'aide à l'agent DELIVEROO");
 					$this->email->to($mail);
 					$this->email->subject("Création de votre compte utilisateur Outil d'aide à l'agent ");
 					
-					$this->email->message('
-						<strong>Bonjour '.strtoupper($prenom).'</strong><br/><br/>
-						<p>Votre compte a été créer pour utiliser l\'outil d\'aide à l\'agent DELIVEROO.</p>
-						<p>Mais il n\'est pas encore activé, veuillez aviser votre N+1 de l\'activer.</p>
-						<p>Ci-joint les détails</p>
-						<h2>Information sur votre compte : </h2>
-						<ol>
-							<li>Matricule : '.$matricule.'</li>
-							<li>Mot de passe : '.$pass.'</li>
-							<li>Lien : http://aide-agent.vivetic.com:8888/deliveroo</li>
-						</ol>
-						<p>Cordialement</p> 
-						<p><h4>Administration <span style="color:blue;">DELIVEROO</span></h4></p>
-						');
+					$this->email->message($view_mail);
 
 
 					$result = $this->email->send();
@@ -347,6 +344,199 @@ class Utilisateur extends CI_Controller
 
 			}else{
 				echo form_error('matricule' ,'<div class="alert alert-danger" align="center">' ,'</div>').";".form_error('prenom' ,'<div class="alert alert-danger" align="center">' ,'</div>').";".form_error('mail' ,'<div class="alert alert-danger" align="center">' ,'</div>').";".form_error('pass' ,'<div class="alert alert-danger" align="center">' ,'</div>');
+			}
+
+		}else{
+			redirect('login');
+		}
+
+    }
+
+    public function modifier_profil(){
+
+    	$base = BASEPATH;
+
+    	$filename       = 'logo_mail.png';
+
+    	$rep = 'assets/images/'.$filename;
+
+    	$directory = str_replace("system/", $rep, $base);
+
+    	$this->email->phpmailer->AddEmbeddedImage($directory, 'logo_mail');
+
+		if($this->input->post('ajax') == '1'){
+
+
+			$id_user = (int) $this->input->post('id_user');
+
+
+			if($this->input->post('modif') == 'mail_renseigne'){
+
+				// VALIDATION DU CHAMPS DU FORMULAIRE (Libelle traitement)
+				$this->form_validation->set_rules('prenom', 'Prénom', 'min_length[4]|max_length[20]|trim|required|xss_clean|htmlspecialchars');
+				$this->form_validation->set_rules('mail', 'E-mail', 'valid_email|trim|required|htmlspecialchars');
+
+				// PERSONNALISATION DES MESSAGES D'ERREUR
+				$this->form_validation->set_message('required', 'Le champs est obligatoire');
+				$this->form_validation->set_message('htmlspecialchars', 'Caractères invalide');
+				$this->form_validation->set_message('xss_clean', 'Caractères invalide');
+				$this->form_validation->set_message('valid_email', 'E-mail invalide');
+				$this->form_validation->set_message('min_length', 'Longueur de champs minimum invalide');
+				$this->form_validation->set_message('max_length', 'Longueur de champs maximum invalide');
+				
+
+				// TRAITEMENT DU FORMULAIRE
+				if($this->form_validation->run()) {
+
+					$prenom = $this->input->post('prenom');
+					$matricule = $this->input->post('matricule');
+					$pass = $this->input->post('pass');
+					$mail = $this->input->post('mail');
+
+
+					$data['prenom'] = $prenom;
+					$data['matricule'] = $matricule;
+					$data['pass'] = $pass;
+					$data['statut'] = 'mail_renseigne';
+
+					$view_mail = $this->load->view('front/mail/mail_view.php', $data, true);
+						
+
+					$result = $this->email->from("tolotra_si@vivetic.mg", "Outil d'aide à l'agent DELIVEROO")
+									->to($mail)
+									->subject("Renseignement de votre adresse E-mail dans l'Outil d'aide à l'agent DELIVEROO")
+
+									->message($view_mail)
+							->send();
+
+						if($result){
+
+							$data_user = array(
+								'prenom' => $prenom,
+								'mail' => $mail
+							);
+							
+							$utilisateur = $this->user->editer_user($id_user, $data_user);
+
+							if($utilisateur){
+								echo "success";
+							}else{
+								echo "erreur";
+							}
+
+						}else{
+
+							echo "erreur-mail";
+						}
+
+				}else{
+					echo form_error('prenom' ,'<div class="alert alert-danger" align="center">' ,'</div>')."|||".form_error('mail' ,'<div class="alert alert-danger" align="center">' ,'</div>')."|||".form_error('pass' ,'<div class="alert alert-danger" align="center">' ,'</div>');
+				}
+
+			}else if($this->input->post('modif') == 'modif_pass_mail'){
+
+				// VALIDATION DU CHAMPS DU FORMULAIRE (Libelle traitement)
+				$this->form_validation->set_rules('prenom', 'Prénom', 'min_length[4]|max_length[20]|trim|required|xss_clean|htmlspecialchars');
+				$this->form_validation->set_rules('pass', 'Mot de passe', 'trim|required|min_length[4]|max_length[8]|xss_clean|htmlspecialchars');
+				$this->form_validation->set_rules('mail', 'E-mail', 'valid_email|trim|required|xss_clean|htmlspecialchars');
+
+				// PERSONNALISATION DES MESSAGES D'ERREUR
+				$this->form_validation->set_message('required', 'Le champs est obligatoire');
+				$this->form_validation->set_message('htmlspecialchars', 'Caractères invalide');
+				$this->form_validation->set_message('xss_clean', 'Caractères invalide');
+				$this->form_validation->set_message('valid_email', 'E-mail invalide');
+				$this->form_validation->set_message('min_length', 'Longueur de champs minimum invalide');
+				$this->form_validation->set_message('max_length', 'Longueur de champs maximum invalide');
+				
+
+				// TRAITEMENT DU FORMULAIRE
+				if($this->form_validation->run()) {
+
+					$prenom = $this->input->post('prenom');
+					$matricule = $this->input->post('matricule');
+					$pass = $this->input->post('pass');
+					$mail = $this->input->post('mail');
+
+					$data['prenom'] = $prenom;
+					$data['matricule'] = $matricule;
+					$data['pass'] = $pass;
+					$data['statut'] = 'modif_pass_mail';
+
+					$view_mail = $this->load->view('front/mail/mail_view.php', $data, true);
+
+					$result = $this->email->from("tolotra_si@vivetic.mg", "Outil d'aide à l'agent DELIVEROO")
+						->to($mail)
+						->subject("Modification mot de passe et renseignement de votre adresse E-mail dans l'Outil d'aide à l'agent DELIVEROO")
+						
+						->message($view_mail)
+						->send();
+
+						//var_dump($result);
+
+						if($result){
+
+							$data_user = array(
+								'prenom' => $prenom,
+								'mail' => $mail,
+								'pass' => $pass
+							);
+							
+							$utilisateur = $this->user->editer_user($id_user, $data_user);
+
+							if($utilisateur){
+								echo "success";
+							}else{
+								echo "erreur";
+							}
+
+						}else{
+
+							echo "erreur-mail";
+						}
+
+				}else{
+					echo form_error('prenom' ,'<div class="alert alert-danger" align="center">' ,'</div>')."|||".form_error('mail' ,'<div class="alert alert-danger" align="center">' ,'</div>')."|||".form_error('pass' ,'<div class="alert alert-danger" align="center">' ,'</div>');
+				}
+
+			}else if($this->input->post('modif') == 'modif_pass'){
+
+				// VALIDATION DU CHAMPS DU FORMULAIRE (Libelle traitement)
+				$this->form_validation->set_rules('prenom', 'Prénom', 'min_length[4]|max_length[20]|trim|required|xss_clean|htmlspecialchars');
+				$this->form_validation->set_rules('pass', 'Mot de passe', 'trim|required|min_length[4]|max_length[8]|xss_clean|htmlspecialchars');
+				// PERSONNALISATION DES MESSAGES D'ERREUR
+				$this->form_validation->set_message('required', 'Le champs est obligatoire');
+				$this->form_validation->set_message('htmlspecialchars', 'Caractères invalide');
+				$this->form_validation->set_message('xss_clean', 'Caractères invalide');
+				$this->form_validation->set_message('min_length', 'Longueur de champs minimum invalide');
+				$this->form_validation->set_message('max_length', 'Longueur de champs maximum invalide');
+				
+
+				// TRAITEMENT DU FORMULAIRE
+				if($this->form_validation->run()) {
+
+					$prenom = $this->input->post('prenom');
+					$pass = $this->input->post('pass');
+					$mail = $this->input->post('mail');
+
+							$data_user = array(
+								'prenom' => $prenom,
+								'mail' => $mail,
+								'pass' => $pass
+							);
+							
+							$utilisateur = $this->user->editer_user($id_user, $data_user);
+
+							if($utilisateur){
+								echo "success";
+							}else{
+								echo "erreur";
+							}
+
+						
+
+				}else{
+					echo form_error('prenom' ,'<div class="alert alert-danger" align="center">' ,'</div>')."|||".form_error('mail' ,'<div class="alert alert-danger" align="center">' ,'</div>')."|||".form_error('pass' ,'<div class="alert alert-danger" align="center">' ,'</div>');
+				}
 			}
 
 		}else{

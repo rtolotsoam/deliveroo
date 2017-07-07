@@ -1,5 +1,5 @@
 
-<div id="content"><h1 class="content-heading bg-white border-bottom <?php if($level != "admin"){ echo "hidden"; }?>"><a href="#ajout-traitement" data-toggle="modal" class="btn btn-success">AJOUTER TRAITEMENT</a></h1> 
+<div id="content"><h1 class="content-heading bg-white border-bottom <?php if($level != "admin"){ echo "hidden"; }?>"><a href="#ajout-traitement" data-toggle="modal" class="btn btn-success">AJOUTER TRAITEMENT</a>&nbsp;<a href="#ajout-photos-traitement" data-toggle="modal" class="btn btn-success">AJOUTER PHOTOS TRAITEMENT</a></h1> 
 <div class="innerAll spacing-x2">
 
     	

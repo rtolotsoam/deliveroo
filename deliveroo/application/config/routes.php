@@ -45,7 +45,7 @@ $route['404_override'] = 'erreur';
 $route['back/traitement_admin/supprimer_traitement/(:num)'] = 'back/traitement_admin/supprimer_traitement/$1';
 $route['front/accueil_traitement/(:num)'] = 'front/accueil_traitement/accueil_traitement/$1';
 $route['front/accueil_processus/(:num)'] = 'front/accueil_processus/accueil_processus/$1';
-
+$route['back/fte_histo_user_c_export/(:any)/(:any)/(:any)/(:any)/(:any)'] = 'back/fte_histo_user_c_export/export/$1/$2/$3/$4/$5';
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */

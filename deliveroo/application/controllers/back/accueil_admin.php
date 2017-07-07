@@ -14,6 +14,7 @@ class Accueil_admin extends CI_Controller
         $this->load->model('fte_categories','cats');
         $this->load->model('fte_traitement','traits');
         $this->load->model('fte_processus','procs');
+        $this->load->model('fte_notification','not');
 
         $this->load->library('form_validation');
 
@@ -392,6 +393,7 @@ class Accueil_admin extends CI_Controller
             );
             
             $ret = $this->cats->editer_categories($catid, $data);
+            $ret2 = $this->cats->editer_categories_parent_id($catid, $data);
             echo site_url('back/accueil_admin/normal');
                
         }else{
@@ -415,6 +417,7 @@ class Accueil_admin extends CI_Controller
             );
             
             $ret = $this->cats->editer_categories($catid, $data);
+            $ret2 = $this->cats->editer_categories_parent_id($catid, $data);
             echo site_url('back/accueil_admin/normal');
                
         }else{
@@ -461,6 +464,39 @@ class Accueil_admin extends CI_Controller
 
 
                 if($this->cats->editer_categories($id_cat, $data) && $this->traits->modifier_traitement($id_cat_trait, $data1)){
+
+                    $today = date('Y-m-d H:i:s');
+
+                    $hiers = $this->cats->hierarchie3($id_cat);
+
+                    $chemin = "";
+                    foreach ($hiers as $hier) {
+                        $chemin = $chemin.''.$hier->libelle_categories.'§§§';
+                    }
+
+                    if($flag_cat == "1"){
+                        $flag_vrai = "Activer";
+                    }else{
+                        $flag_vrai = "Désactiver";
+                    }
+
+                    $libelle_sous_cat = $this->cats->liste_categories_by_id((int) $sous_cat);
+
+                    $data_notification = array(
+                            'description'       => $chemin.''.$libelle_cat,
+                            'objet'             => "Modification d'un traitement par ".ucfirst($this->session->userdata('prenom')).' (Mle : '.$this->session->userdata('mle').')',
+                            'matricule_modif'   => $this->session->userdata('mle'),
+                            'commentaires'      => "<ul class='etape'>
+                                                        <li> <b> Libelle traitement : </b>".$libelle_cat."</li>
+                                                        <li> <b> Libelle catégorie : </b>".$libelle_sous_cat[0]->libelle_categories."</li>
+                                                        <li><b> Visibilié : </b> ".$flag_vrai."</li>
+                                                    </ul>",
+                            'datetime_modif'    => $today
+                    );
+
+                    $this->not->ajouter_notification($data_notification);
+
+
                     echo "success";                            
                 }else{
                     echo "erreur";
@@ -513,6 +549,37 @@ class Accueil_admin extends CI_Controller
 
 
                 if($this->cats->editer_categories($id_cat_modif, $data) && $this->traits->modifier_traitement($id_cat_modif, $data1)){
+
+                    $today = date('Y-m-d H:i:s');
+
+                    $hiers = $this->cats->hierarchie2($id_cat_modif);
+
+                    $chemin = "";
+                    foreach ($hiers as $hier) {
+                        $chemin = $chemin.''.$hier->libelle_categories.'§§§';
+                    }
+
+                    if($flag_cat_trait_modif == "1"){
+                        $flag_vrai = "Activer";
+                    }else{
+                        $flag_vrai = "Désactiver";
+                    }
+
+                    $data_notification = array(
+                            'description'       => $chemin.''.$libelle_cat_trait_modif,
+                            'objet'             => "Modification d'une catégorie par ".ucfirst($this->session->userdata('prenom')).' (Mle : '.$this->session->userdata('mle').')',
+                            'matricule_modif'   => $this->session->userdata('mle'),
+                            'commentaires'      => "<ul class='etape'>
+                                                        <li> <b> Libelle catégorie : </b> ".$libelle_cat_trait_modif."</li>
+                                                        <li> <b> Contenu catégorie : </b>  ".$cont_cat_trait_modif."</li>
+                                                        <li> <b> Visibilié : </b> ".$flag_vrai."</li>
+                                                    </ul>",
+                            'datetime_modif'    => $today
+                    );
+
+                    $this->not->ajouter_notification($data_notification);
+
+                    
                     echo "success";                            
                 }else{
                     echo "erreur";
